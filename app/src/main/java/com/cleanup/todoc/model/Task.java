@@ -1,5 +1,10 @@
 package com.cleanup.todoc.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
+import android.content.ContentValues;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -10,17 +15,21 @@ import java.util.Comparator;
  *
  * @author Gaëtan HERFRAY
  */
+@Entity(foreignKeys = @ForeignKey(entity = Project.class,
+        parentColumns = "id",
+        childColumns = "projectId"))
 public class Task {
+    // ATTRIBUTES
+
     /**
      * The unique identifier of the task
      */
+    @PrimaryKey(autoGenerate = true)
     private long id;
-
     /**
      * The unique identifier of the project associated to the task
      */
     private long projectId;
-
     /**
      * The name of the task
      */
@@ -28,12 +37,14 @@ public class Task {
     @SuppressWarnings("NullableProblems")
     @NonNull
     private String name;
-
     /**
      * The timestamp when the task has been created
      */
     private long creationTimestamp;
 
+    // CONSTRUCTOR
+    @Ignore
+    private Task() {}
     /**
      * Instantiates a new Task.
      *
@@ -47,9 +58,9 @@ public class Task {
         this.setProjectId(projectId);
         this.setName(name);
         this.setCreationTimestamp(creationTimestamp);
-
-        System.out.println("time : "+creationTimestamp);
     }
+
+    // GETTER
 
     /**
      * Returns the unique identifier of the task.
@@ -59,35 +70,6 @@ public class Task {
     public long getId() {
         return id;
     }
-
-    /**
-     * Sets the unique identifier of the task.
-     *
-     * @param id the unique idenifier of the task to set
-     */
-    private void setId(long id) {
-        this.id = id;
-    }
-
-    /**
-     * Sets the unique identifier of the project associated to the task.
-     *
-     * @param projectId the unique identifier of the project associated to the task to set
-     */
-    private void setProjectId(long projectId) {
-        this.projectId = projectId;
-    }
-
-    /**
-     * Returns the project associated to the task.
-     *
-     * @return the project associated to the task
-     */
-    @Nullable
-    public Project getProject() {
-        return Project.getProjectById(projectId);
-    }
-
     /**
      * Returns the name of the task.
      *
@@ -97,7 +79,35 @@ public class Task {
     public String getName() {
         return name;
     }
+    /**
+     * Returns the unique identifier of the project of the task
+     * @return the unique identifier of the project of the task
+     */
+    public long getProjectId() { return projectId; }
+    /**
+     * Returns the creation timestamp of the task
+     * @return the creation timestamp of the task
+     */
+    public long getCreationTimestamp() { return creationTimestamp; }
 
+    // SETTER
+
+    /**
+     * Sets the unique identifier of the task.
+     *
+     * @param id the unique idenifier of the task to set
+     */
+    private void setId(long id) {
+        this.id = id;
+    }
+    /**
+     * Sets the unique identifier of the project associated to the task.
+     *
+     * @param projectId the unique identifier of the project associated to the task to set
+     */
+    private void setProjectId(long projectId) {
+        this.projectId = projectId;
+    }
     /**
      * Sets the name of the task.
      *
@@ -106,7 +116,6 @@ public class Task {
     private void setName(@NonNull String name) {
         this.name = name;
     }
-
     /**
      * Sets the timestamp when the task has been created.
      *
@@ -114,6 +123,18 @@ public class Task {
      */
     private void setCreationTimestamp(long creationTimestamp) {
         this.creationTimestamp = creationTimestamp;
+    }
+
+    // METHODS
+
+    /**
+     * Returns the project associated to the task.
+     *
+     * @return the project associated to the task
+     */
+    @Nullable
+    public Project getProject() {
+        return Project.getProjectById(projectId);
     }
 
     /**
@@ -154,5 +175,20 @@ public class Task {
         public int compare(Task left, Task right) {
             return (int) (left.creationTimestamp - right.creationTimestamp);
         }
+    }
+
+    public static Task fromContentValues(ContentValues values) {
+        final Task task = new Task();
+        if (values.containsKey("projectId")) {
+            task.setProjectId(values.getAsLong("projectId"));
+        }
+        if (values.containsKey("name")) {
+            task.setName(values.getAsString("name"));
+        }
+        if (values.containsKey("creationTimestamp")) {
+            task.setCreationTimestamp(values.getAsLong("creationTimestamp"));
+        }
+
+        return task;
     }
 }

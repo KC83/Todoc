@@ -1,5 +1,7 @@
 package com.cleanup.todoc.ui;
 
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,12 +20,16 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.cleanup.todoc.R;
+import com.cleanup.todoc.injection.Injection;
+import com.cleanup.todoc.injection.ViewModelFactory;
 import com.cleanup.todoc.model.Project;
 import com.cleanup.todoc.model.Task;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 /**
  * <p>Home activity of the application which is displayed when the user opens the app.</p>
@@ -32,16 +38,19 @@ import java.util.Date;
  * @author Gaëtan HERFRAY
  */
 public class MainActivity extends AppCompatActivity implements TasksAdapter.DeleteTaskListener {
+    // FOR DATA
+    private TaskViewModel taskViewModel;
+
     /**
      * List of all projects available in the application
      */
-    private final Project[] allProjects = Project.getAllProjects();
+    private Project[] allProjects = Project.getAllProjects();
 
     /**
      * List of all current tasks of the application
      */
     @NonNull
-    private final ArrayList<Task> tasks = new ArrayList<>();
+    private ArrayList<Task> tasks = new ArrayList<>();
 
     /**
      * The adapter which handles the list of tasks
@@ -100,12 +109,11 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
         listTasks.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         listTasks.setAdapter(adapter);
 
-        findViewById(R.id.fab_add_task).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showAddTaskDialog();
-            }
-        });
+        findViewById(R.id.fab_add_task).setOnClickListener(view -> showAddTaskDialog());
+
+        this.configureViewModel();
+        this.getTasks();
+        this.getProjects();
     }
 
     @Override
@@ -136,7 +144,43 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     @Override
     public void onDeleteTask(Task task) {
         tasks.remove(task);
+        this.taskViewModel.deleteTask(task.getId());
         updateTasks();
+    }
+
+    private void configureViewModel() {
+        ViewModelFactory viewModelFactory = Injection.provideViewModelFactory(this);
+        this.taskViewModel = ViewModelProviders.of(this,viewModelFactory).get(TaskViewModel.class);
+    }
+
+    /**
+     * Get all the tasks saved in the database
+     */
+    private void getTasks() {
+        this.taskViewModel.getTasks().observe(this, this::updateTasksList);
+    }
+    /**
+     * Refresh the task list with data of the database
+     * @param taskList
+     */
+    private void updateTasksList(List<Task> taskList){
+        this.adapter.updateTasks(taskList);
+        tasks = new ArrayList<>(taskList);
+        updateTasks();
+    }
+
+    /**
+     * Get all the projects saved in the database
+     */
+    private void getProjects() {
+        this.taskViewModel.getProjects().observe(this, this::updateProjectsList);
+    }
+    /**
+     * Refresh the project list with the data of the database
+     * @param projectList
+     */
+    private void updateProjectsList(List<Project> projectList) {
+        allProjects = projectList.toArray(new Project[projectList.size()]);
     }
 
     /**
@@ -173,6 +217,8 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
                         new Date().getTime()
                 );
 
+
+                this.taskViewModel.createTask(task);
                 addTask(task);
 
                 dialogInterface.dismiss();

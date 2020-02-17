@@ -1,5 +1,7 @@
 package com.cleanup.todoc.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,23 +11,27 @@ import android.support.annotation.Nullable;
  *
  * @author Gaëtan HERFRAY
  */
+@Entity
 public class Project {
+    // ATTRIBUTES
+
     /**
      * The unique identifier of the project
      */
+    @PrimaryKey(autoGenerate = true)
     private final long id;
-
     /**
      * The name of the project
      */
     @NonNull
     private final String name;
-
     /**
      * The hex (ARGB) code of the color associated to the project
      */
     @ColorInt
     private final int color;
+
+    // CONSTRUCTOR
 
     /**
      * Instantiates a new Project.
@@ -34,11 +40,42 @@ public class Project {
      * @param name  the name of the project to set
      * @param color the hex (ARGB) code of the color associated to the project to set
      */
-    private Project(long id, @NonNull String name, @ColorInt int color) {
+    public Project(long id, @NonNull String name, @ColorInt int color) {
         this.id = id;
         this.name = name;
         this.color = color;
     }
+
+    // GETTER
+
+    /**
+     * Returns the unique identifier of the project.
+     *
+     * @return the unique identifier of the project
+     */
+    public long getId() {
+        return id;
+    }
+    /**
+     * Returns the name of the project.
+     *
+     * @return the name of the project
+     */
+    @NonNull
+    public String getName() {
+        return name;
+    }
+    /**
+     * Returns the hex (ARGB) code of the color associated to the project.
+     *
+     * @return the hex (ARGB) code of the color associated to the project
+     */
+    @ColorInt
+    public int getColor() {
+        return color;
+    }
+
+    // METHODS
 
     /**
      * Returns all the projects of the application.
@@ -68,35 +105,6 @@ public class Project {
                 return project;
         }
         return null;
-    }
-
-    /**
-     * Returns the unique identifier of the project.
-     *
-     * @return the unique identifier of the project
-     */
-    public long getId() {
-        return id;
-    }
-
-    /**
-     * Returns the name of the project.
-     *
-     * @return the name of the project
-     */
-    @NonNull
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Returns the hex (ARGB) code of the color associated to the project.
-     *
-     * @return the hex (ARGB) code of the color associated to the project
-     */
-    @ColorInt
-    public int getColor() {
-        return color;
     }
 
     @Override

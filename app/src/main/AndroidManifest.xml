@@ -19,5 +19,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Provider -->
+        <provider
+            android:name=".provider.TaskContentProvider"
+            android:authorities="com.openclassrooms.todoc.provider"
+            android:exported="true"/>
     </application>
 </manifest>

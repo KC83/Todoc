@@ -143,7 +143,7 @@ public class Task {
     public static class TaskAZComparator implements Comparator<Task> {
         @Override
         public int compare(Task left, Task right) {
-            return left.name.compareTo(right.name);
+            return left.name.toLowerCase().compareTo(right.name.toLowerCase());
         }
     }
 
@@ -153,7 +153,7 @@ public class Task {
     public static class TaskZAComparator implements Comparator<Task> {
         @Override
         public int compare(Task left, Task right) {
-            return right.name.compareTo(left.name);
+            return right.name.toLowerCase().compareTo(left.name.toLowerCase());
         }
     }
 

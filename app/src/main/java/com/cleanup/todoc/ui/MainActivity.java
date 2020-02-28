@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
      * The sort method to be used to display tasks
      */
     @NonNull
-    private SortMethod sortMethod = SortMethod.NONE;
+    private SortMethod sortMethod = SortMethod.OLD_FIRST;
 
     /**
      * Dialog to create a new task

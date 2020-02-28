@@ -28,4 +28,7 @@ public interface TaskDao {
 
     @Query("SELECT * FROM Task")
     Cursor getTasksWithCursor();
+
+    @Query("DELETE FROM Task")
+    void deleteAllTasks();
 }

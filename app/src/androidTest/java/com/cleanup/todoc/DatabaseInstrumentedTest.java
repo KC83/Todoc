@@ -63,7 +63,6 @@ public class DatabaseInstrumentedTest {
 
         // Check the count of project in the database
         assertEquals(3, projects.size());
-        assertEquals(Project.getAllProjects().length, projects.size());
     }
     @Test
     public void getProjectByIdFromDatabase() {

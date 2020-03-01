@@ -63,16 +63,10 @@ import static org.mockito.Mockito.when;
  */
 @RunWith(AndroidJUnit4.class)
 public class MainActivityInstrumentedTest {
-    private ProjectDao mProjectDao;
     private TaskDao mTaskDao;
     private TodocDatabase mDatabase;
 
     private List<Task> mTasks;
-
-    private Observer<List<Task>> mMockObserverListTask;
-    private Observer<Task> mMockObserverTask;
-    private Observer<List<Project>> mMockObserverListProject;
-    private Observer<Project> mMockObserverProject;
 
     @Rule
     public ActivityTestRule<MainActivity> rule = new ActivityTestRule<>(MainActivity.class);
@@ -82,22 +76,13 @@ public class MainActivityInstrumentedTest {
         Context context = InstrumentationRegistry.getContext();
         mDatabase = TodocDatabase.getInstance(context);
         //mDatabase = Room.inMemoryDatabaseBuilder(context,TodocDatabase.class).build();
-        mProjectDao = mDatabase.projectDao();
         mTaskDao = mDatabase.taskDao();
-
-        /*mMockObserverListTask = (Observer<List<Task>>) Mockito.mock(Observer.class);
-        mMockObserverTask = (Observer<Task>) Mockito.mock(Observer.class);
-        mMockObserverListProject = (Observer<List<Project>>) Mockito.mock(Observer.class);
-        mMockObserverProject = (Observer<Project>) Mockito.mock(Observer.class);
-
-        Mockito.clearInvocations(mMockObserverListProject);*/
     }
     @After
     public void closeDb() {
         if (mDatabase != null && mDatabase.isOpen()) {
             //mDatabase.close();
         }
-        //Mockito.clearInvocations(mMockObserverListProject);
     }
 
     @Test
@@ -154,6 +139,10 @@ public class MainActivityInstrumentedTest {
         onView(withRecyclerView(R.id.list_tasks).atPositionOnView(1, R.id.lbl_task_name)).check(matches(withText("zzz Tâche example")));
         onView(withRecyclerView(R.id.list_tasks).atPositionOnView(2, R.id.lbl_task_name)).check(matches(withText("hhh Tâche example")));
 
+        // Check if the task is inserted in the database
+        mTasks = getValue(mTaskDao.getTasks());
+        assertEquals(3, mTasks.size());
+
         // Sort alphabetical
         onView(withId(R.id.action_filter)).perform(click());
         onView(withText(R.string.sort_alphabetical)).perform(click());
@@ -203,43 +192,4 @@ public class MainActivityInstrumentedTest {
         }
         return (T) data[0];
     }
-
-    /// #########################################################
-    /*
-    @Test
-    public void getProjectsFromDatabase() {
-        Mockito.clearInvocations(mMockObserverListProject);
-        mProjectDao.getProjects().observeForever(mMockObserverListProject);
-        verify(mMockObserverListProject).onChanged(ArgumentMatchers.argThat(new ArgumentMatcher<List<Project>>() {
-            @Override
-            public boolean matches(List<Project> argument) {
-                return argument != null || argument.size() != 0;
-            }
-        }));
-        Mockito.clearInvocations(mMockObserverListProject);
-    }
-    @Test
-    public void getProjectById() {
-        mProjectDao.getProject(2L).observeForever(mMockObserverProject);
-        verify(mMockObserverProject).onChanged(ArgumentMatchers.argThat(new ArgumentMatcher<Project>() {
-            @Override
-            public boolean matches(Project argument) {
-                return argument.getName().equals("Projet Lucidia");
-            }
-        }));
-    }
-    @Test
-    public void getTasksFromDatabase() {
-        mTaskDao.deleteAllTasks(); // DELETE TABLE TASK
-
-        // Create a new task if their is no task saved
-        if (mTaskDao.getTasks() == null) {
-            onView(withId(R.id.fab_add_task)).perform(click());
-            onView(withId(R.id.txt_task_name)).perform(replaceText("Tâche example n°1"));
-            onView(withId(android.R.id.button1)).perform(click());
-        }
-
-        assertNotNull(mTaskDao.getTasks());
-    }
-    */
 }

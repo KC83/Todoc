@@ -1,9 +1,17 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('D:\\KEYSTORE - Android\\Todoc-keystore.jks')
+            storePassword 'todocKeystore'
+            keyAlias = 'Todoc'
+            keyPassword 'todocKey'
+        }
+    }
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.cleanup.todoc"
+        applicationId "kelly.cleanup.todoc"
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
@@ -12,7 +20,8 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
